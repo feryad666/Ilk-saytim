@@ -1,21 +1,23 @@
 import streamlit as st
 import requests
 
-# --- TELEGRAM AYARLARI ---
-TOKEN = "8593680837:AAFFEgqzVObAl24xUJWpOzBT9kAaFPv0zqs"
-MY_ID = "1333597393" # Sənin ID-ni bura yerləşdirdim
-
 def mesaj_gonder(ad, elaqe, mesaj):
-    base_url = f"https://api.telegram.org{TOKEN}/sendMessage"
+    # Linki tam hazır şəkildə bura qoyuram, heç bir simvolu dəyişmə
+    tam_link = "https://api.telegram.org"
+    
     metn = f"🚀 YENİ SİFARİŞ!\n\n👤 Ad: {ad}\n📞 Əlaqə: {elaqe}\n📝 Mesaj: {mesaj}"
-    params = {"chat_id": MY_ID, "text": metn}
-    response = requests.get(base_url, params=params)
+    
+    parametrler = {
+        "chat_id": "1333597393",
+        "text": metn
+    }
+    
+    response = requests.get(tam_link, params=parametrler)
     return response.status_code
 
-# --- SAYTIN DİZAYNI ---
+# --- SAYTIN GÖRÜNÜŞÜ ---
 st.set_page_config(page_title="Feryad Digital", page_icon="🚀")
 st.title("🚀 Feryad Digital Mağaza")
-st.write("Sifariş formunu doldurun, biz sizinlə əlaqə saxlayaq.")
 
 with st.form("sifaris_formu", clear_on_submit=True):
     ad = st.text_input("Adınız:")
@@ -28,10 +30,10 @@ with st.form("sifaris_formu", clear_on_submit=True):
             try:
                 status = mesaj_gonder(ad, elaqe, mesaj)
                 if status == 200:
-                    st.success(f"Təbriklər {ad}! Sifarişiniz bizə çatdı.")
+                    st.success(f"Təbriklər {ad}! Sifarişiniz Telegram-a göndərildi.")
                     st.balloons()
                 else:
-                    st.error(f"Xəta: Botu Telegram-da tapıb START basdığınızdan əmin olun.")
+                    st.error(f"Xəta kodu: {status}. Zəhmət olmasa Telegram-da botu tapıb START basın.")
             except Exception as e:
                 st.error(f"Sistem xətası: {e}")
         else:
