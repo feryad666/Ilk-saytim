@@ -2,33 +2,48 @@ import streamlit as st
 import requests
 
 # --- TELEGRAM AYARLARI ---
-TOKEN = '8593680837:AAFFEgqzVObAl24xUJWpOzBT9kAaFPv0zqs'
-# Bura MÜTLƏQ öz rəqəmlərdən ibarət ID-ni yaz (məsələn: '12345678')
-MY_ID = 'Bura_ID_Rəqəmlərini_Yaz' 
+# Bura toxunma, hər şey yerindədir
+TOKEN = "8593680837:AAFFEgqzVObAl24xUJWpOzBT9kAaFPv0zqs"
+
+# DİQQƏT: Aşağıdakı dırnaq içindəki sözləri sil və @userinfobot-dan aldığın ID-ni yaz
+MY_ID = "BURA_OZ_ID_NOMRENI_YAZ" 
 
 def mesaj_gonder(ad, elaqe, mesaj):
-    metn = f"Sifariş gəldi!\nAd: {ad}\nƏlaqə: {elaqe}\nMesaj: {mesaj}"
-    # Linkin strukturu tam dəqiq belə olmalıdır:
-    url = f"https://api.telegram.org{TOKEN}/sendMessage"
-    payload = {'chat_id': MY_ID, 'text': metn}
-    requests.get(url, params=payload)
+    # Linkin quruluşunu kod avtomatik düzəldir
+    base_url = f"https://api.telegram.org{TOKEN}/sendMessage"
+    metn = f"🚀 YENİ SİFARİŞ!\n\n👤 Ad: {ad}\n📞 Əlaqə: {elaqe}\n📝 Mesaj: {mesaj}"
+    
+    params = {
+        "chat_id": MY_ID,
+        "text": metn
+    }
+    
+    response = requests.get(base_url, params=params)
+    return response.status_code
 
-# --- SAYTIN GÖRÜNÜŞÜ ---
+# --- SAYTIN DİZAYNI ---
 st.title("🚀 Feryad Digital Mağaza")
+st.write("Sifariş formunu doldurun, biz sizinlə əlaqə saxlayaq.")
 
-with st.form("my_form", clear_on_submit=True):
+with st.form("sifaris_formu", clear_on_submit=True):
     ad = st.text_input("Adınız:")
-    elaqe = st.text_input("Əlaqə nömrəniz:")
-    mesaj = st.text_area("Sifarişiniz nədir?")
-    submit = st.form_submit_button("Sifarişi Tamamla")
+    elaqe = st.text_input("Telefon və ya Email:")
+    mesaj = st.text_area("Nə sifariş etmək istəyirsiniz?")
+    submit = st.form_submit_button("Sifarişi Göndər")
     
     if submit:
         if ad and elaqe and mesaj:
-            try:
-                mesaj_gonder(ad, elaqe, mesaj)
-                st.success("Təbriklər! Sifarişiniz qəbul edildi. Telegram-a bildiriş göndərildi.")
-                st.balloons()
-            except Exception as e:
-                st.error(f"Xəta: {e}")
+            if MY_ID == "BURA_OZ_ID_NOMRENI_YAZ":
+                st.error("Zəhmət olmasa koddakı MY_ID hissəsinə öz Telegram ID-nizi yazın!")
+            else:
+                try:
+                    status = mesaj_gonder(ad, elaqe, mesaj)
+                    if status == 200:
+                        st.success(f"Təbriklər {ad}! Sifarişiniz bizə çatdı.")
+                        st.balloons()
+                    else:
+                        st.error(f"Telegram xətası: Status kodu {status}. Botu oyatdığınızdan əmin olun.")
+                except Exception as e:
+                    st.error(f"Sistem xətası: {e}")
         else:
             st.warning("Zəhmət olmasa bütün xanaları doldurun!")
