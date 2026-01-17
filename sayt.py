@@ -2,15 +2,15 @@ import streamlit as st
 import requests
 
 # --- TELEGRAM AYARLARI ---
-# Bura öz bot tokenini yaz
 TOKEN = '8593680837:AAFFEgqzVObAl24xUJWpOzBT9kAaFPv0zqs'
-# Bura öz Telegram ID-ni yazmalısan (Aşağıda necə tapacağını deyəcəm)
-MY_ID = 'SƏNİN_ID_NOMRƏN' 
+MY_ID = 'SƏNİN_ID_NOMRƏN' # Bura @userinfobot-dan aldığın ID-ni yazmağı unutma
 
 def mesaj_gonder(ad, elaqe, mesaj):
     metn = f"🔔 YENİ SİFARİŞ!\n\n👤 Ad: {ad}\n📞 Əlaqə: {elaqe}\n📝 Mesaj: {mesaj}"
-    url = f"https://api.telegram.org{TOKEN}/sendMessage?chat_id={MY_ID}&text={metn}"
-    requests.get(url)
+    url = f"https://api.telegram.org{TOKEN}/sendMessage"
+    payload = {'chat_id': MY_ID, 'text': metn}
+    # Bu üsul (params) boşluqları və simvolları avtomatik düzəldir
+    requests.get(url, params=payload)
 
 # --- SAYTIN DİZAYNI ---
 st.set_page_config(page_title="Feryad Digital", page_icon="💻")
@@ -18,11 +18,10 @@ st.set_page_config(page_title="Feryad Digital", page_icon="💻")
 st.title("🚀 Feryad Digital Xidmətlər")
 st.write("Biznesinizi rəqəmsal dünyaya daşıyın!")
 
-# Sifariş Forması
 st.divider()
 st.subheader("📩 Sifariş və ya sualınız var?")
 
-with st.form("elaqe_formu"):
+with st.form("elaqe_formu", clear_on_submit=True):
     ad = st.text_input("Adınız:")
     elaqe = st.text_input("Email və ya Telefonunuz:")
     mesaj = st.text_area("Necə kömək edə bilərik?")
@@ -30,7 +29,11 @@ with st.form("elaqe_formu"):
     
     if submit:
         if ad and elaqe and mesaj:
-            mesaj_gonder(ad, elaqe, mesaj)
-            st.success(f"Təşəkkürlər, {ad}! Mesajınız bizə çatdı.")
+            try:
+                mesaj_gonder(ad, elaqe, mesaj)
+                st.success(f"Təşəkkürlər, {ad}! Mesajınız bizə çatdı.")
+                st.balloons()
+            except Exception as e:
+                st.error("Xəta baş verdi. Zəhmət olmasa bir az sonra yenidən yoxlayın.")
         else:
-            st.error("Zəhmət olmasa bütün xanaları doldurun!")
+            st.warning("Zəhmət olmasa bütün xanaları doldurun!")
